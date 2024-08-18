@@ -42,21 +42,29 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
+  // 1) Check if email and password is exist!
+  if (!email || !password) {
+    res.status(400);
+    throw new Error('Please provide email and password!');
+  }
+
   const existingUser = await User.findOne({ email });
 
+  // 2) Check if user exists and password is correct
   if (
     existingUser &&
-    (await existingUser?.isPasswordValid(password, existingUser?.password))
+    (await existingUser.isPasswordValid(password, existingUser.password))
   ) {
+    // 3) If every thing ok, send token to client
     generateToken(res, existingUser._id);
-    res.status(201).json({
+    res.status(200).json({
       _id: existingUser._id,
       username: existingUser.username,
       email: existingUser.email,
     });
   } else {
     res.status(401);
-    throw new Error('Pleas login');
+    throw new Error('Email or password is incorrect!');
   }
 });
 
