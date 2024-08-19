@@ -31,23 +31,15 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
-reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
+reviewSchema.index({ book: 1, user: 1 }, { unique: true });
 
 // Review Populating
 reviewSchema.pre(/^find/, function (next) {
-  // this.populate({
-  //   path: 'tour',
-  //   select: 'name',
-  // }).populate({
-  //   path: 'user',
-  //   select: 'name photo',
-  // });
-
   this.populate({
-    path: 'user',
-    select: 'name photo',
+    path: 'book',
+    select: 'title author -_id',
   });
-
+  
   next();
 });
 
@@ -64,7 +56,6 @@ reviewSchema.statics.clcRatingAverages = async function (bookId) {
       },
     },
   ]);
-  console.log(stats);
 
   if (stats.length > 0) {
     await Book.findByIdAndUpdate(bookId, {
