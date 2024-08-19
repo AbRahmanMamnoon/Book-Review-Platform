@@ -1,4 +1,5 @@
 import User from '../models/userModel.js';
+import Review from '../models/reviewModel.js';
 import asyncHandler from '../middlewares/asyncHandler.js';
 import validMongoDBId from '../utils/validateMongoDBId.js';
 import generateToken from '../utils/generateToken.js';
@@ -79,15 +80,17 @@ const logoutCurrentUser = asyncHandler(async (req, res) => {
 });
 
 const getCurrentUserProfile = asyncHandler(async (req, res) => {
-  const { _id } = req.user;
-  validMongoDBId(_id);
-  const user = await User.findById(_id);
+  const userId = req.user._id; // AuthenticateUser middleware sets req.user
+  validMongoDBId(userId);
+  const user = await User.findById(userId);
+  const userReviews = await Review.find({ user: userId });
 
   if (user) {
     res.json({
       _id: user._id,
       username: user.username,
       email: user.email,
+      userReviews,
     });
   } else {
     res.status(404);
@@ -96,21 +99,21 @@ const getCurrentUserProfile = asyncHandler(async (req, res) => {
 });
 
 const updateCurrentUserProfile = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id);
+  const { _id } = req.user;
+  validMongoDBId(_id);
+
+  const user = await User.findById(_id);
 
   if (user) {
-    user.firstName = req.body.firstName || user.firstName;
-    user.lastName = req.body.lastName || user.lastName;
+    user.username = req.body.username || user.username;
     user.email = req.body.email || user.email;
 
     const updatedUser = await user.save();
 
     res.json({
       _id: updatedUser._id,
-      firstName: updatedUser.firstName,
-      lastName: updatedUser.lastName,
+      username: updatedUser.username,
       email: updatedUser.email,
-      isAdmin: updatedUser.isAdmin,
     });
   } else {
     res.status(404);
