@@ -1,0 +1,52 @@
+[
+  {
+    "title": "The Art of War",
+    "author": "Sun Tzu",
+    "description": "An ancient Chinese military treatise dating from the Late Spring and Autumn Period.",
+    "publishedDate": "2015-11-01T00:00:00.000Z",
+    "publisher": "Shambhala Publications",
+    "pageCount": 273,
+    "language": "English",
+    "coverImageUrl": "https://example.com/the-art-of-war.jpg"
+  },
+  {
+    "title": "1984",
+    "author": "George Orwell",
+    "description": "A dystopian social science fiction novel and cautionary tale about the dangers of totalitarianism.",
+    "publishedDate": "1949-06-08T00:00:00.000Z",
+    "publisher": "Secker & Warburg",
+    "pageCount": 328,
+    "language": "English",
+    "coverImageUrl": "https://example.com/1984.jpg"
+  },
+  {
+    "title": "To Kill a Mockingbird",
+    "author": "Harper Lee",
+    "description": "A novel of warmth and humor despite dealing with serious issues of rape and racial inequality.",
+    "publishedDate": "1960-07-11T00:00:00.000Z",
+    "publisher": "J.B. Lippincott & Co.",
+    "pageCount": 281,
+    "language": "English",
+    "coverImageUrl": "https://example.com/to-kill-a-mockingbird.jpg"
+  },
+  {
+    "title": "The Catcher in the Rye",
+    "author": "J.D. Salinger",
+    "description": "A story about adolescent alienation and loss of innocence in the protagonist Holden Caulfield.",
+    "publishedDate": "1951-07-16T00:00:00.000Z",
+    "publisher": "Little, Brown and Company",
+    "pageCount": 277,
+    "language": "English",
+    "coverImageUrl": "https://example.com/the-catcher-in-the-rye.jpg"
+  },
+  {
+    "title": "Pride and Prejudice",
+    "author": "Jane Austen",
+    "description": "A romantic novel of manners that critiques the British landed gentry at the end of the 18th century.",
+    "publishedDate": "1813-01-28T00:00:00.000Z",
+    "publisher": "T. Egerton, Whitehall",
+    "pageCount": 432,
+    "language": "English",
+    "coverImageUrl": "https://example.com/pride-and-prejudice.jpg"
+  }
+]
