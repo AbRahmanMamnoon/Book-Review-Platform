@@ -42,6 +42,7 @@ const bookSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+bookSchema.index({ title: 1, author: 1 }, { unique: true });
 
 //Export the model
 export default mongoose.model('Book', bookSchema);
