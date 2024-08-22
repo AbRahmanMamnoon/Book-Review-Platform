@@ -38,8 +38,11 @@ reviewSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'book',
     select: 'title author -_id',
+  }).populate({
+    path: 'user',
+    select: 'username',
   });
-  
+
   next();
 });
 
