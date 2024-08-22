@@ -4,6 +4,7 @@ import {
   loginUser,
   logoutCurrentUser,
   getCurrentUserProfile,
+  currentUserReviews,
   updateCurrentUserProfile,
 } from '../controllers/userController.js';
 
@@ -11,10 +12,11 @@ import authenticate from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
+router.route('/register').post(registerUser);
 router.post('/login', loginUser);
 router.post('/logout', logoutCurrentUser);
+router.get('/user-reviews', authenticate, currentUserReviews);
 
-router.route('/').post(registerUser);
 router
   .route('/profile')
   .get(authenticate, getCurrentUserProfile)
