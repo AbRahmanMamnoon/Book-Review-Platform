@@ -41,24 +41,93 @@ const createReview = asyncHandler(async (req, res) => {
 });
 
 const getAllReviews = asyncHandler(async (req, res) => {
-  let query = Review.find();
+  const { page = 1, limit = 3, searchTerm = '' } = req.query;
+  let query;
+  let totalDocuments;
 
-  // Pagination
-  const page = req.query.page;
-  const limit = req.query.limit;
-  const skip = (page - 1) * limit;
-  query = query.skip(skip).limit(limit);
+  if (searchTerm) {
+    // Count total documents that match the search criteria
+    const countAggregation = [
+      {
+        $lookup: {
+          from: 'books',
+          localField: 'book',
+          foreignField: '_id',
+          as: 'bookDetails',
+        },
+      },
+      {
+        $unwind: '$bookDetails',
+      },
+      {
+        $match: {
+          $or: [
+            { 'bookDetails.title': { $regex: searchTerm, $options: 'i' } },
+            { 'bookDetails.author': { $regex: searchTerm, $options: 'i' } },
+          ],
+        },
+      },
+      {
+        $count: 'totalCount',
+      },
+    ];
 
-  if (req.query.page) {
-    const productCount = await Review.countDocuments();
-    if (skip >= productCount) throw new Error('This page does not exists!');
+    const countResult = await Review.aggregate(countAggregation);
+    totalDocuments = countResult[0]?.totalCount || 0;
+
+    // Apply pagination to the search query
+    query = Review.aggregate([
+      {
+        $lookup: {
+          from: 'books',
+          localField: 'book',
+          foreignField: '_id',
+          as: 'bookDetails',
+        },
+      },
+      {
+        $unwind: '$bookDetails',
+      },
+      {
+        $match: {
+          $or: [
+            { 'bookDetails.title': { $regex: searchTerm, $options: 'i' } },
+            { 'bookDetails.author': { $regex: searchTerm, $options: 'i' } },
+          ],
+        },
+      },
+      {
+        $project: {
+          review: 1,
+          rating: 1,
+          title: '$bookDetails.title',
+          author: '$bookDetails.author',
+        },
+      },
+    ])
+      .skip((page - 1) * limit)
+      .limit(limit);
+  } else {
+    // Count total documents without search
+    totalDocuments = await Review.countDocuments();
+
+    // Apply pagination to the general query
+    query = Review.find()
+      .skip((page - 1) * limit)
+      .limit(limit);
   }
+
+  if ((page - 1) * limit >= totalDocuments)
+    throw new Error('This page does not exist!');
+
   const reviews = await query;
-  res.status(200).json(reviews);
+  const totalPages = Math.ceil(totalDocuments / limit);
+
+  res.status(200).json({ reviews, totalPages });
 });
 
 const searchReviewsByBook = asyncHandler(async (req, res) => {
-  const { titleOrKeyword } = req.query;
+  const { searchTerm } = req.query;
   try {
     const reviews = await Review.aggregate([
       {
@@ -75,8 +144,8 @@ const searchReviewsByBook = asyncHandler(async (req, res) => {
       {
         $match: {
           $or: [
-            { 'bookDetails.title': { $regex: titleOrKeyword, $options: 'i' } },
-            { 'bookDetails.author': { $regex: titleOrKeyword, $options: 'i' } },
+            { 'bookDetails.title': { $regex: searchTerm, $options: 'i' } },
+            { 'bookDetails.author': { $regex: searchTerm, $options: 'i' } },
           ],
         },
       },
