@@ -57,11 +57,12 @@ const loginUser = asyncHandler(async (req, res) => {
     (await existingUser.isPasswordValid(password, existingUser.password))
   ) {
     // 3) If every thing ok, send token to client
-    generateToken(res, existingUser._id);
+    const token = generateToken(res, existingUser._id);
     res.status(200).json({
       _id: existingUser._id,
       username: existingUser.username,
       email: existingUser.email,
+      token,
     });
   } else {
     res.status(401);
@@ -83,19 +84,24 @@ const getCurrentUserProfile = asyncHandler(async (req, res) => {
   const userId = req.user._id; // AuthenticateUser middleware sets req.user
   validMongoDBId(userId);
   const user = await User.findById(userId);
-  const userReviews = await Review.find({ user: userId });
 
   if (user) {
-    res.json({
+    res.status(200).json({
       _id: user._id,
       username: user.username,
       email: user.email,
-      userReviews,
     });
   } else {
     res.status(404);
     throw new Error('User not found.');
   }
+});
+
+const currentUserReviews = asyncHandler(async (req, res) => {
+  const userId = req.user._id; // AuthenticateUser middleware sets req.user
+  const userReviews = await Review.find({ user: userId });
+
+  res.status(200).json(userReviews);
 });
 
 const updateCurrentUserProfile = asyncHandler(async (req, res) => {
@@ -126,5 +132,6 @@ export {
   loginUser,
   logoutCurrentUser,
   getCurrentUserProfile,
+  currentUserReviews,
   updateCurrentUserProfile,
 };
